@@ -827,6 +827,8 @@ class App:
         self.msg_lbl = tk.Label(self.main, text=self.HINT, bg=T["bg"], fg=T["sub"],
                                 font=(FONT, FS(10)), wraplength=S(380), justify="center")
         self.msg_lbl.pack(pady=(S(6), 0))
+        tk.Label(self.main, text="风好大 制作", bg=T["bg"], fg=T["faint"],
+                 font=(FONT, FS(9))).pack()
 
         # ---- 恢复上次状态 ----
         self.mode = st["mode"]
