@@ -50,3 +50,13 @@ python 定时关机.pyw
 |---|---|
 | `定时关机.pyw` | 程序本体（单文件，图标已内嵌） |
 | `定时关机.ico` | 图标文件（快捷方式用，可选） |
+
+---
+
+<div align="center">
+
+**风好大 制作** · 2026
+
+定时关机助手 · Shutdown Timer for Windows
+
+</div>
