@@ -2,7 +2,9 @@
 
 ![banner](docs/banner.png)
 
-一个 Windows 单文件定时关机小工具：深色现代界面、环形进度倒计时、执行前弹窗提醒。仅依赖 Python 标准库，下载即用。
+一个 Windows 单文件定时关机小工具：深色现代界面、环形进度倒计时、执行前弹窗提醒。
+
+**[⬇️ 下载最新版 exe（免安装，双击即用）](https://github.com/3042407270bj-dot/shutdown-timer/releases/latest)** · 无需 Python，个别杀毒软件误报请添加信任
 
 <div align="center"><img src="screenshot.png" width="380" alt="界面截图"></div>
 
