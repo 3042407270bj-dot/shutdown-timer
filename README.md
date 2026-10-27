@@ -2,7 +2,7 @@
 
 ![banner](docs/banner.png)
 
-一个 Windows 单文件定时关机小工具：深色现代界面、环形进度倒计时、执行前弹窗提醒。
+定时关机助手（Shutdown Timer）是一款免费开源的 Windows 定时关机软件：深色现代界面、环形进度倒计时、执行前弹窗提醒、8 种界面语言，专为「睡前挂机」场景设计。
 
 **[⬇️ 下载最新版 exe（免安装，双击即用）](https://github.com/3042407270bj-dot/shutdown-timer/releases/latest)** · 无需 Python，个别杀毒软件误报请添加信任
 
