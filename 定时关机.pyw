@@ -323,7 +323,7 @@ def round_rect(cv, x1, y1, x2, y2, r, fill=None, outline=None, width=1):
 
 def render_ring_photo(size, thick, frac, track, accent, end_col, danger_col, danger):
     """整环一次抗锯齿渲染：轨道 + 渐变进度弧（12 点起、逆时针推进）+ 端点圆头"""
-    ss = 4
+    ss = 5
     img = Image.new("RGBA", (size * ss, size * ss), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     pad = thick // 2 + 2
@@ -427,7 +427,7 @@ class Btn(tk.Canvas):
             fill = T["accent_lo"] if self.style == "solid" else mix(T["danger"], "#000000", 0.25)
         self._tween(fill, outline, fg)
 
-    def _tween(self, fill, outline, fg, n=4):
+    def _tween(self, fill, outline, fg, n=8):
         """颜色平滑过渡，连续触发时以最新目标为准"""
         self._anim = getattr(self, "_anim", 0) + 1
         my = self._anim
@@ -497,7 +497,7 @@ class Chip(tk.Canvas):
         my = self._anim
         start = self._cur or (bg, fg, outline)
 
-        def step(i, n=4):
+        def step(i, n=8):
             if my != self._anim:
                 return
             t = i / n
@@ -594,7 +594,7 @@ class IconBtn(tk.Canvas):
         my = self._anim
         start = self._cur or (bg, fg)
 
-        def step(i, n=4):
+        def step(i, n=8):
             if my != self._anim:
                 return
             t = i / n
@@ -650,7 +650,7 @@ class Segmented(tk.Canvas):
         self._anim += 1
         my = self._anim
 
-        def step(i, n=5):
+        def step(i, n=8):
             if my != self._anim:
                 return
             xx = start_x + (x0 - start_x) * (i / n)
@@ -703,7 +703,7 @@ class Switch(tk.Canvas):
         self._anim += 1
         my = self._anim
 
-        def step(i, n=5):
+        def step(i, n=8):
             if my != self._anim:
                 return
             if animate:
@@ -793,11 +793,11 @@ class WarnWindow:
         self.win.geometry(f"+{self.tx}+{self.ty}")
 
     def _slide(self, x, y, i):
-        n = 8
+        n = 14
         yy = int(y + (self.ty - y) * (i / n))
         self.win.geometry(f"+{x}+{yy}")
         if i < n:
-            self.win.after(14, self._slide, x, y, i + 1)
+            self.win.after(12, self._slide, x, y, i + 1)
 
     def _update(self):
         t = self.app.task
@@ -1312,7 +1312,7 @@ class App:
                     self.draw_idle()
         else:
             self.draw_idle()
-        self.root.after(500, self.tick)
+        self.root.after(200, self.tick)
 
     # ---------- 状态与配置 ----------
     def collect(self):
