@@ -76,9 +76,190 @@ THEMES = {
     ),
 }
 
-EXEC_WORD = {"shutdown": "关机", "restart": "重启", "sleep": "休眠"}
 FLAG = {"shutdown": "/s", "restart": "/r"}
-WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
+
+# ---------------- 多语言 ----------------
+LANGS = ["zh", "en", "fr", "ru", "es", "ar", "zh-TW", "la"]
+LANG_NAME = {"zh": "简体中文", "en": "English", "fr": "Français", "ru": "Русский",
+             "es": "Español", "ar": "العربية", "zh-TW": "繁體中文", "la": "Latina"}
+
+I18N = {
+"zh": dict(
+    title="定时关机助手", date_fmt="%m月%d日", wd=("周一", "周二", "周三", "周四", "周五", "周六", "周日"),
+    idle_sub="当前时间 · 暂无任务", executing="执行中",
+    mode_cd="倒计时", mode_at="定点", unit_min_after=" 分钟后", unit_h=" 时  ", unit_m=" 分",
+    plus1h="+1小时", plus2h="+2小时", task_lbl="任务",
+    act_shutdown="关机", act_restart="重启", act_sleep="休眠",
+    remind_lbl="关机前 1 分钟弹窗提醒我", btn_start="开始任务", btn_cancel="取消任务",
+    hint="关机与重启由系统计时，关闭本程序任务依然有效",
+    err_time_invalid="请输入有效的小时和分钟", err_time_range="时间范围：时 0-23，分 0-59",
+    err_time_past="定点时间需晚于当前时间", err_minutes_invalid="请输入有效的分钟数",
+    err_minutes_positive="分钟数需大于 0", err_admin="设置失败：请尝试以管理员身份运行",
+    err_no_task="当前没有进行中的任务", err_cancel_fail="取消失败：任务可能已被取消",
+    err_postpone_fail="推迟失败，请手动重新设置", err_sleep_fail="休眠失败：系统可能未启用休眠功能",
+    ok_set="已设定 {t} {w}", sleep_tip="（休眠由本程序计时，请保持程序运行）",
+    ok_cancel="已取消定时任务", ok_cancel_sleep="已取消休眠任务",
+    ok_postpone="任务已推迟 10 分钟", ok_slept="已执行休眠",
+    quick_filled="已填入 {v}，点击「开始任务」生效",
+    warn_soon="即将{w}", warn_body="{w}任务将于 {t} 执行，请保存好工作内容",
+    btn_wcancel="取消任务", btn_postpone="推迟10分钟", btn_ignore="忽略",
+    close_title="退出确认", close_body="有一个休眠任务正在进行中，\n退出后该任务将被取消。确定退出吗？",
+    lang_set="语言已切换：{n}",
+),
+"en": dict(
+    title="Shutdown Timer", date_fmt="%b %d", wd=("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+    idle_sub="Current time · No task", executing="Running…",
+    mode_cd="Countdown", mode_at="Scheduled", unit_min_after=" min", unit_h=" h  ", unit_m=" min",
+    plus1h="+1 hour", plus2h="+2 hours", task_lbl="Action",
+    act_shutdown="Shut down", act_restart="Restart", act_sleep="Sleep",
+    remind_lbl="Remind me 1 minute before", btn_start="Start", btn_cancel="Cancel task",
+    hint="Shutdown & restart are timed by the system — tasks survive closing this app",
+    err_time_invalid="Enter a valid hour and minute", err_time_range="Hour 0–23, minute 0–59",
+    err_time_past="Scheduled time must be in the future", err_minutes_invalid="Enter a valid number of minutes",
+    err_minutes_positive="Minutes must be greater than 0", err_admin="Failed — try running as administrator",
+    err_no_task="No running task", err_cancel_fail="Cancel failed — the task may already be gone",
+    err_postpone_fail="Postpone failed — please set it again", err_sleep_fail="Sleep failed — hibernation may be disabled",
+    ok_set="Task set: {w} at {t}", sleep_tip=" (sleep is timed by this app — keep it running)",
+    ok_cancel="Task cancelled", ok_cancel_sleep="Sleep task cancelled",
+    ok_postpone="Postponed by 10 minutes", ok_slept="Sleep started",
+    quick_filled="{v} filled — press Start to apply",
+    warn_soon="{w} starting soon", warn_body="{w} will run at {t}. Save your work!",
+    btn_wcancel="Cancel", btn_postpone="+10 min", btn_ignore="Dismiss",
+    close_title="Confirm exit", close_body="A sleep task is running.\nIt will be lost if you exit. Quit anyway?",
+    lang_set="Language: {n}",
+),
+"fr": dict(
+    title="Minuterie d'extinction", date_fmt="%d/%m", wd=("Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"),
+    idle_sub="Heure actuelle · Aucune tâche", executing="En cours…",
+    mode_cd="Minuterie", mode_at="Programmé", unit_min_after=" min", unit_h=" h  ", unit_m=" min",
+    plus1h="+1 heure", plus2h="+2 heures", task_lbl="Action",
+    act_shutdown="Éteindre", act_restart="Redémarrer", act_sleep="Veille",
+    remind_lbl="Me rappeler 1 minute avant", btn_start="Démarrer", btn_cancel="Annuler la tâche",
+    hint="Extinction et redémarrage programmés par le système — la tâche persiste après fermeture",
+    err_time_invalid="Saisissez heure et minute valides", err_time_range="Heure 0–23, minute 0–59",
+    err_time_past="L'heure doit être dans le futur", err_minutes_invalid="Saisissez un nombre de minutes valide",
+    err_minutes_positive="Les minutes doivent être supérieures à 0", err_admin="Échec — essayez en administrateur",
+    err_no_task="Aucune tâche en cours", err_cancel_fail="Annulation impossible — la tâche a peut-être disparu",
+    err_postpone_fail="Report impossible — recommencez", err_sleep_fail="Échec de la veille — hibernation peut-être désactivée",
+    ok_set="Tâche définie : {w} à {t}", sleep_tip=" (veille minutée par l'application — laissez-la ouverte)",
+    ok_cancel="Tâche annulée", ok_cancel_sleep="Tâche de veille annulée",
+    ok_postpone="Reportée de 10 minutes", ok_slept="Veille lancée",
+    quick_filled="{v} rempli — cliquez sur Démarrer",
+    warn_soon="{w} imminente", warn_body="{w} à {t}. Sauvegardez votre travail !",
+    btn_wcancel="Annuler", btn_postpone="+10 min", btn_ignore="Ignorer",
+    close_title="Confirmer la fermeture", close_body="Une tâche de veille est en cours.\nElle sera perdue si vous quittez. Fermer quand même ?",
+    lang_set="Langue : {n}",
+),
+"ru": dict(
+    title="Таймер выключения", date_fmt="%d.%m", wd=("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"),
+    idle_sub="Текущее время · Нет задач", executing="Выполняется…",
+    mode_cd="Отсчёт", mode_at="По времени", unit_min_after=" мин", unit_h=" ч  ", unit_m=" мин",
+    plus1h="+1 час", plus2h="+2 часа", task_lbl="Действие",
+    act_shutdown="Выключение", act_restart="Перезагрузка", act_sleep="Спящий режим",
+    remind_lbl="Напомнить за 1 минуту", btn_start="Запустить", btn_cancel="Отменить задачу",
+    hint="Выключение и перезагрузка выполняются системой — задача сохранится после закрытия",
+    err_time_invalid="Введите корректные час и минуту", err_time_range="Час 0–23, минута 0–59",
+    err_time_past="Время должно быть в будущем", err_minutes_invalid="Введите корректное число минут",
+    err_minutes_positive="Минуты должны быть больше 0", err_admin="Не удалось — запустите от имени администратора",
+    err_no_task="Нет активных задач", err_cancel_fail="Не удалось отменить — задача уже исчезла",
+    err_postpone_fail="Не удалось отложить — настройте заново", err_sleep_fail="Не удалось — возможно, спящий режим отключён",
+    ok_set="Задача: {w} в {t}", sleep_tip=" (отсчёт ведёт программа — не закрывайте её)",
+    ok_cancel="Задача отменена", ok_cancel_sleep="Задача сна отменена",
+    ok_postpone="Отложено на 10 минут", ok_slept="Сон запущен",
+    quick_filled="{v} — нажмите «Запустить»",
+    warn_soon="Скоро: {w}", warn_body="{w} в {t}. Сохраните работу!",
+    btn_wcancel="Отменить", btn_postpone="+10 мин", btn_ignore="Скрыть",
+    close_title="Подтвердите выход", close_body="Выполняется задача сна.\nОна будет отменена при выходе. Выйти?",
+    lang_set="Язык: {n}",
+),
+"es": dict(
+    title="Apagado programado", date_fmt="%d/%m", wd=("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"),
+    idle_sub="Hora actual · Sin tareas", executing="Ejecutando…",
+    mode_cd="Cuenta atrás", mode_at="Hora fija", unit_min_after=" min", unit_h=" h  ", unit_m=" min",
+    plus1h="+1 hora", plus2h="+2 horas", task_lbl="Acción",
+    act_shutdown="Apagar", act_restart="Reiniciar", act_sleep="Suspender",
+    remind_lbl="Avisarme 1 minuto antes", btn_start="Iniciar", btn_cancel="Cancelar tarea",
+    hint="Apagado y reinicio los programa el sistema — la tarea vive aunque cierres la app",
+    err_time_invalid="Introduce hora y minuto válidos", err_time_range="Hora 0–23, minuto 0–59",
+    err_time_past="La hora debe ser futura", err_minutes_invalid="Introduce minutos válidos",
+    err_minutes_positive="Los minutos deben ser mayores que 0", err_admin="Error — prueba como administrador",
+    err_no_task="No hay tareas activas", err_cancel_fail="No se pudo cancelar — quizá ya desapareció",
+    err_postpone_fail="No se pudo posponer — configúralo de nuevo", err_sleep_fail="Error al suspender — quizá la hibernación está desactivada",
+    ok_set="Tarea: {w} a las {t}", sleep_tip=" (esta app cuenta el tiempo — mantenla abierta)",
+    ok_cancel="Tarea cancelada", ok_cancel_sleep="Tarea de suspensión cancelada",
+    ok_postpone="Pospuesta 10 minutos", ok_slept="Suspensión iniciada",
+    quick_filled="{v} — pulsa Iniciar",
+    warn_soon="{w} inminente", warn_body="{w} a las {t}. ¡Guarda tu trabajo!",
+    btn_wcancel="Cancelar", btn_postpone="+10 min", btn_ignore="Ignorar",
+    close_title="Confirmar salida", close_body="Hay una tarea de suspensión activa.\nSe perderá al salir. ¿Salir igualmente?",
+    lang_set="Idioma: {n}",
+),
+"ar": dict(
+    title="مؤقت إيقاف التشغيل", date_fmt="%d/%m", wd=("الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"),
+    idle_sub="الوقت الحالي · لا مهام", executing="جارٍ التنفيذ…",
+    mode_cd="عد تنازلي", mode_at="وقت محدد", unit_min_after=" دقيقة", unit_h=" س  ", unit_m=" د",
+    plus1h="+1 ساعة", plus2h="+2 ساعة", task_lbl="الإجراء",
+    act_shutdown="إيقاف", act_restart="إعادة تشغيل", act_sleep="سكون",
+    remind_lbl="ذكّرني قبل دقيقة", btn_start="بدء المهمة", btn_cancel="إلغاء المهمة",
+    hint="يُدير النظام توقيت الإيقاف وإعادة التشغيل — تبقى المهمة بعد إغلاق التطبيق",
+    err_time_invalid="أدخل ساعة ودقيقة صحيحتين", err_time_range="الساعة 0-23 والدقيقة 0-59",
+    err_time_past="يجب أن يكون الوقت في المستقبل", err_minutes_invalid="أدخل عدد دقائق صحيحًا",
+    err_minutes_positive="يجب أن تكون الدقائق أكبر من 0", err_admin="فشل — جرّب التشغيل كمسؤول",
+    err_no_task="لا توجد مهام جارية", err_cancel_fail="تعذّر الإلغاء — ربما أُلغيت المهمة بالفعل",
+    err_postpone_fail="تعذّر التأجيل — أعد الإعداد", err_sleep_fail="فشل السكون — ربما يكون الإسبات معطلًا",
+    ok_set="تم التعيين: {w} الساعة {t}", sleep_tip=" (يحسب التطبيق الوقت — أبقه مفتوحًا)",
+    ok_cancel="أُلغيت المهمة", ok_cancel_sleep="أُلغيت مهمة السكون",
+    ok_postpone="أُجّلت 10 دقائق", ok_slept="بدأ السكون",
+    quick_filled="{v} — اضغط «بدء المهمة»",
+    warn_soon="{w} قريبًا", warn_body="{w} الساعة {t}. احفظ عملك!",
+    btn_wcancel="إلغاء", btn_postpone="+10 د", btn_ignore="تجاهل",
+    close_title="تأكيد الخروج", close_body="توجد مهمة سكون جارية.\nستُفقد عند الخروج. الخروج على أي حال؟",
+    lang_set="اللغة: {n}",
+),
+"zh-TW": dict(
+    title="定時關機助手", date_fmt="%m月%d日", wd=("週一", "週二", "週三", "週四", "週五", "週六", "週日"),
+    idle_sub="現在時間 · 無任務", executing="執行中",
+    mode_cd="倒數", mode_at="定時", unit_min_after=" 分鐘後", unit_h=" 時  ", unit_m=" 分",
+    plus1h="+1小時", plus2h="+2小時", task_lbl="任務",
+    act_shutdown="關機", act_restart="重新啟動", act_sleep="睡眠",
+    remind_lbl="關機前 1 分鐘彈窗提醒我", btn_start="開始任務", btn_cancel="取消任務",
+    hint="關機與重新啟動由系統計時，關閉本程式任務依然有效",
+    err_time_invalid="請輸入有效的小時和分鐘", err_time_range="時間範圍：時 0-23，分 0-59",
+    err_time_past="定時時間需晚於目前時間", err_minutes_invalid="請輸入有效的分鐘數",
+    err_minutes_positive="分鐘數需大於 0", err_admin="設定失敗：請以系統管理員身分執行",
+    err_no_task="目前沒有進行中的任務", err_cancel_fail="取消失敗：任務可能已被取消",
+    err_postpone_fail="延後失敗，請重新設定", err_sleep_fail="睡眠失敗：系統可能未啟用休眠功能",
+    ok_set="已設定 {t} {w}", sleep_tip="（睡眠由本程式計時，請保持程式執行）",
+    ok_cancel="已取消定時任務", ok_cancel_sleep="已取消睡眠任務",
+    ok_postpone="任務已延後 10 分鐘", ok_slept="已進入睡眠",
+    quick_filled="已填入 {v}，點擊「開始任務」生效",
+    warn_soon="即將{w}", warn_body="{w}任務將於 {t} 執行，請保存好工作內容",
+    btn_wcancel="取消任務", btn_postpone="延後10分鐘", btn_ignore="忽略",
+    close_title="結束確認", close_body="有睡眠任務進行中，\n結束後任務將被取消。確定離開嗎？",
+    lang_set="語言已切換：{n}",
+),
+"la": dict(
+    title="Tempus Exstinctionis", date_fmt="%d.%m", wd=("Lun", "Mar", "Mer", "Iov", "Ven", "Sab", "Sol"),
+    idle_sub="Hora nunc · Nulla officia", executing="Agitur…",
+    mode_cd="Numerus", mode_at="Hora statuta", unit_min_after=" minuta", unit_h=" h  ", unit_m=" min",
+    plus1h="+1 hora", plus2h="+2 horae", task_lbl="Officium",
+    act_shutdown="Exstinctio", act_restart="Reinitium", act_sleep="Somnus",
+    remind_lbl="Mone me 1 minuta ante", btn_start="Incipere", btn_cancel="Officium tollere",
+    hint="Exstinctio et reinitium a systemate numerantur — officium manet etiam si app claudatur",
+    err_time_invalid="Horam minutamque validam scribe", err_time_range="Hora 0–23, minuta 0–59",
+    err_time_past="Hora futura esse debet", err_minutes_invalid="Numerum minutorum validum scribe",
+    err_minutes_positive="Minuta maior quam 0 esse debent", err_admin="Defecit — scribe ut administrator",
+    err_no_task="Nullum officium agitur", err_cancel_fail="Tollere non potui — fortasse officium iam abiit",
+    err_postpone_fail="Differre non potui — iterum conare", err_sleep_fail="Somnus defecit — fortasse somnus hiemalis vetitus est",
+    ok_set="Officium: {w} hora {t}", sleep_tip=" (app numerat — eam apud te serva)",
+    ok_cancel="Officium abolitum est", ok_cancel_sleep="Officium somni abolitum est",
+    ok_postpone="10 minutis diffusum", ok_slept="Somnus incepit",
+    quick_filled="{v} — Incipere preme",
+    warn_soon="{w} mox", warn_body="{w} hora {t}. Serva opus tuum!",
+    btn_wcancel="Tolle", btn_postpone="+10 min", btn_ignore="Dissolve",
+    close_title="Confirmare exitum", close_body="Officium somni agitur.\nPeribit si exieris. Exire tamen?",
+    lang_set="Lingua: {n}",
+)}
 
 CFG_DIR = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "ShutdownTimer")
 CFG_FILE = os.path.join(CFG_DIR, "config.json")
@@ -366,6 +547,14 @@ def icon_pin(cv, color, bg):
     cv.create_line(cx, top + S(5), cx, cy + S(8), fill=color, width=S(2), capstyle="round")
 
 
+def icon_globe(cv, color, bg):
+    cx, cy = cv.W / 2, cv.H / 2
+    r = S(9)
+    cv.create_oval(cx - r, cy - r, cx + r, cy + r, outline=color, width=S(2))
+    cv.create_line(cx - r, cy, cx + r, cy, fill=color, width=S(2))
+    cv.create_oval(cx - r * 0.42, cy - r, cx + r * 0.42, cy + r, outline=color, width=S(2))
+
+
 class IconBtn(tk.Canvas):
     """小图标按钮：draw_fn(cv, color, bg) 自绘单色图标，带悬停颜色过渡"""
 
@@ -545,7 +734,7 @@ class WarnWindow:
 
     def __init__(self, app, remain):
         self.app = app
-        self.word = EXEC_WORD[app.task["type"]]
+        self.word = app.t("act_" + app.task["type"])
         self.remain = remain
         T = app.T
         w, h = S(332), S(212)
@@ -565,7 +754,7 @@ class WarnWindow:
         top.pack(anchor="w")
         tk.Label(top, text="⚠", bg=T["card"], fg=T["warn"],
                  font=(FONT, FS(15), "bold")).pack(side="left")
-        tk.Label(top, text=f"  即将{self.word}", bg=T["card"], fg=T["text"],
+        tk.Label(top, text=f"  {app.t('warn_soon', w=self.word)}", bg=T["card"], fg=T["text"],
                  font=(FONT, FS(13), "bold")).pack(side="left")
         self.sub_lbl = tk.Label(inner, text="", bg=T["card"], fg=T["sub"],
                                 font=(FONT, FS(10)), anchor="w")
@@ -575,11 +764,11 @@ class WarnWindow:
         self.t_lbl.pack(pady=S(2))
         brow = tk.Frame(inner, bg=T["card"])
         brow.pack(pady=(S(8), 0))
-        Btn(brow, app, "取消任务", self.do_cancel, w=S(94), h=S(34),
+        Btn(brow, app, app.t("btn_wcancel"), self.do_cancel, w=S(94), h=S(34),
             style="danger", font_size=11).pack(side="left")
-        Btn(brow, app, "推迟10分钟", self.do_postpone, w=S(108), h=S(34),
+        Btn(brow, app, app.t("btn_postpone"), self.do_postpone, w=S(108), h=S(34),
             style="soft", font_size=11).pack(side="left", padx=S(8))
-        Btn(brow, app, "忽略", self.dismiss, w=S(66), h=S(34),
+        Btn(brow, app, app.t("btn_ignore"), self.dismiss, w=S(66), h=S(34),
             style="ghost", font_size=11).pack(side="left")
 
         sw, sh = win.winfo_screenwidth(), win.winfo_screenheight()
@@ -613,7 +802,8 @@ class WarnWindow:
     def _update(self):
         t = self.app.task
         if t:
-            self.sub_lbl.config(text=f"{EXEC_WORD[t['type']]}任务将于 {t['target']} 执行，请保存好工作内容")
+            self.sub_lbl.config(text=self.app.t(
+                "warn_body", w=self.app.t("act_" + t["type"]), t=t["target"]))
         self.t_lbl.config(text=fmt_sec(self.remain))
 
     def _poll(self):
@@ -646,13 +836,14 @@ class WarnWindow:
 
 # ---------------- 主程序 ----------------
 class App:
-    HINT = "关机与重启由系统计时，关闭本程序任务依然有效"
 
     def __init__(self, root):
         self.root = root
         cfg = load_cfg()
         self.theme_name = cfg.get("theme", "dark")
         self.T = THEMES[self.theme_name]
+        self.lang = cfg.get("lang", "zh") if cfg.get("lang") in LANGS else "zh"
+        self.HINT = self.t("hint")
         self.state = dict(
             mode=cfg.get("mode", "cd"), ttype=cfg.get("ttype", "shutdown"),
             hh=str(cfg.get("hh", "23")), mm=str(cfg.get("mm", "30")),
@@ -667,6 +858,11 @@ class App:
             root.attributes("-topmost", True)
         self.root.after(60, self.apply_chrome)
         self.tick()
+
+    def t(self, key, **kw):
+        """取当前语言的文案，缺漏时回退中文基准"""
+        s = I18N[self.lang].get(key) or I18N["zh"][key]
+        return s.format(**kw) if kw else s
 
     # ---------- 界面构建 ----------
     def mk(self, parent, text, size=10, key="sub", bold=False):
@@ -704,6 +900,7 @@ class App:
     def build(self, recenter=True):
         T = self.T
         st = self.state
+        self.HINT = self.t("hint")
         self.root.title("定时关机助手")
         self.root.configure(bg=T["bg"])
         self.root.resizable(False, False)
@@ -724,16 +921,18 @@ class App:
                          width=max(2, S(2)), capstyle="round")
         tit = tk.Frame(head, bg=T["bg"])
         tit.pack(side="left", padx=(S(10), 0))
-        tk.Label(tit, text="定时关机助手", bg=T["bg"], fg=T["text"],
+        tk.Label(tit, text=self.t("title"), bg=T["bg"], fg=T["text"],
                  font=(FONT, FS(15), "bold")).pack(anchor="w")
         self.clock_lbl = tk.Label(tit, text="", bg=T["bg"], fg=T["sub"], font=(FONT, FS(10)))
         self.clock_lbl.pack(anchor="w")
         self.btn_top = IconBtn(head, self, icon_pin, self.toggle_top)
         self.btn_top.pack(side="right")
+        self.btn_lang = IconBtn(head, self, icon_globe, self.toggle_language)
+        self.btn_lang.pack(side="right")
         self.btn_theme = IconBtn(head, self,
                                  icon_sun if self.theme_name == "dark" else icon_moon,
                                  self.toggle_theme)
-        self.btn_theme.pack(side="right", padx=(0, S(8)))
+        self.btn_theme.pack(side="right", padx=(0, S(6)))
         self.btn_top.set_selected(st["topmost"])
 
         # ---- 进度环卡片 ----
@@ -763,7 +962,8 @@ class App:
                                                font=(FONT, FS(10)), fill=T["sub"])
 
         # ---- 模式分段 ----
-        self.seg = Segmented(self.main, self, [("cd", "倒计时"), ("at", "定点")],
+        self.seg = Segmented(self.main, self, [("cd", self.t("mode_cd")),
+                                               ("at", self.t("mode_at"))],
                              self.set_mode, w=S(392))
         self.seg.pack(fill="x", pady=(S(12), 0))
 
@@ -775,7 +975,7 @@ class App:
         self.p_cd = tk.Frame(self.panel_box, bg=T["bg"])
         self.e_min = self.make_entry(self.p_cd, 6, vmax=5256000, decimal=True)
         self.e_min.pack(side="left", ipady=S(7))
-        self.mk(self.p_cd, " 分钟后", 11).pack(side="left")
+        self.mk(self.p_cd, self.t("unit_min_after"), 11).pack(side="left")
         quick = tk.Frame(self.p_cd, bg=T["bg"])
         quick.pack(side="right")
         for m in (15, 30, 60, 120):
@@ -784,14 +984,14 @@ class App:
         self.p_at = tk.Frame(self.panel_box, bg=T["bg"])
         self.e_h = self.make_entry(self.p_at, 4, vmax=23)
         self.e_h.pack(side="left", ipady=S(7))
-        self.mk(self.p_at, " 时  ", 11).pack(side="left")
+        self.mk(self.p_at, self.t("unit_h"), 11).pack(side="left")
         self.e_m = self.make_entry(self.p_at, 4, vmax=59)
         self.e_m.pack(side="left", ipady=S(7))
-        self.mk(self.p_at, " 分", 11).pack(side="left")
+        self.mk(self.p_at, self.t("unit_m"), 11).pack(side="left")
         quick2 = tk.Frame(self.p_at, bg=T["bg"])
         quick2.pack(side="right")
-        Chip(quick2, self, "+1小时", lambda: self._quick_hours(1), w=S(76)).pack(side="left", padx=(S(6), 0))
-        Chip(quick2, self, "+2小时", lambda: self._quick_hours(2), w=S(76)).pack(side="left", padx=(S(6), 0))
+        Chip(quick2, self, self.t("plus1h"), lambda: self._quick_hours(1), w=S(76)).pack(side="left", padx=(S(6), 0))
+        Chip(quick2, self, self.t("plus2h"), lambda: self._quick_hours(2), w=S(76)).pack(side="left", padx=(S(6), 0))
 
         self.e_min.insert(0, st["minutes"])
         self.e_h.insert(0, st["hh"])
@@ -800,27 +1000,27 @@ class App:
         # ---- 任务类型 ----
         trow = tk.Frame(self.main, bg=T["bg"])
         trow.pack(fill="x", pady=(S(12), 0))
-        self.mk(trow, "任务", 11).pack(side="left")
+        self.mk(trow, self.t("task_lbl"), 11).pack(side="left")
         tf = tk.Frame(trow, bg=T["bg"])
         tf.pack(side="left", padx=S(14))
         self.type_chips = {}
         for key in ("shutdown", "restart", "sleep"):
-            ch = Chip(tf, self, EXEC_WORD[key], lambda k=key: self.set_type(k), w=S(96))
+            ch = Chip(tf, self, self.t("act_" + key), lambda k=key: self.set_type(k), w=S(96))
             ch.pack(side="left", padx=(0, S(8)))
             self.type_chips[key] = ch
 
         # ---- 提醒开关 ----
         rrow = tk.Frame(self.main, bg=T["bg"])
         rrow.pack(fill="x", pady=(S(10), 0))
-        self.mk(rrow, "关机前 1 分钟弹窗提醒我", 10.5).pack(side="left")
+        self.mk(rrow, self.t("remind_lbl"), 10.5).pack(side="left")
         self.sw_remind = Switch(rrow, self, init=st["remind"])
         self.sw_remind.pack(side="right")
 
         # ---- 主按钮 ----
-        self.btn_start = Btn(self.main, self, "开始任务", self.start,
+        self.btn_start = Btn(self.main, self, self.t("btn_start"), self.start,
                              w=S(392), h=S(46), style="solid")
         self.btn_start.pack(fill="x", pady=(S(14), 0))
-        self.btn_cancel = Btn(self.main, self, "取消任务", self.cancel,
+        self.btn_cancel = Btn(self.main, self, self.t("btn_cancel"), self.cancel,
                               w=S(392), h=S(40), style="ghost")
         self.btn_cancel.pack(fill="x", pady=(S(8), 0))
 
@@ -890,7 +1090,7 @@ class App:
     def _quick_min(self, m):
         self.e_min.delete(0, "end")
         self.e_min.insert(0, str(m))
-        self.flash(f"已填入 {m} 分钟，点击「开始任务」生效", "sub")
+        self.flash(self.t("quick_filled", v=f"{m} {self.t('unit_min_after').strip()}"), "sub")
 
     def _quick_hours(self, hcount):
         t = datetime.datetime.now() + datetime.timedelta(hours=hcount)
@@ -899,7 +1099,25 @@ class App:
         self.e_h.insert(0, f"{t.hour:02d}")
         self.e_m.delete(0, "end")
         self.e_m.insert(0, f"{t.minute:02d}")
-        self.flash(f"已填入 {t.hour:02d}:{t.minute:02d}，点击「开始任务」生效", "sub")
+        self.flash(self.t("quick_filled", v=f"{t.hour:02d}:{t.minute:02d}"), "sub")
+
+    def toggle_language(self):
+        nxt = LANGS[(LANGS.index(self.lang) + 1) % len(LANGS)]
+        self.collect()
+        self.lang = nxt
+        self.save_state()
+        px, py = self.root.winfo_x(), self.root.winfo_y()
+        topmost = self.btn_top.sel
+        self.main.destroy()
+        self.build(recenter=False)
+        self.root.geometry(f"+{px}+{py}")
+        self.apply_chrome()
+        self.root.lift()
+        self.root.focus_force()
+        if topmost:
+            self.root.attributes("-topmost", True)
+        self.tick()
+        self.flash(self.t("lang_set", n=LANG_NAME[nxt]), "ok")
 
     def toggle_top(self):
         v = not self.btn_top.sel
@@ -946,56 +1164,56 @@ class App:
             try:
                 hh, mm = int(self.e_h.get()), int(self.e_m.get())
             except ValueError:
-                return self.flash("请输入有效的小时和分钟", "danger")
+                return self.flash(self.t("err_time_invalid"), "danger")
             if not (0 <= hh <= 23 and 0 <= mm <= 59):
-                return self.flash("时间范围：时 0-23，分 0-59", "danger")
+                return self.flash(self.t("err_time_range"), "danger")
             now = datetime.datetime.now()
             target = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
             if target <= now:
-                return self.flash("定点时间需晚于当前时间", "danger")
+                return self.flash(self.t("err_time_past"), "danger")
             sec = max(1, int((target - now).total_seconds()))
             target_str = f"{hh:02d}:{mm:02d}"
         else:
             try:
                 minutes = float(self.e_min.get())
             except ValueError:
-                return self.flash("请输入有效的分钟数", "danger")
+                return self.flash(self.t("err_minutes_invalid"), "danger")
             if minutes <= 0:
-                return self.flash("分钟数需大于 0", "danger")
+                return self.flash(self.t("err_minutes_positive"), "danger")
             sec = max(5, int(round(minutes * 60)))
             target_str = (datetime.datetime.now() +
                           datetime.timedelta(seconds=sec)).strftime("%H:%M")
 
-        word = EXEC_WORD[self.ttype]
+        word = self.t("act_" + self.ttype)
         task = dict(type=self.ttype, end=time.time() + sec, total=sec,
                     target=target_str, warned=False)
         if self.ttype in FLAG:
             if self.task and self.task.get("sys"):
                 run_cmd(["shutdown", "/a"])
             if not run_cmd(["shutdown", FLAG[self.ttype], "/t", str(sec)]):
-                return self.flash("设置失败：请尝试以管理员身份运行", "danger")
+                return self.flash(self.t("err_admin"), "danger")
             task["sys"] = True
             self.task = task
             tip = ""
         else:
             task["sys"] = False
             self.task = task
-            tip = "（休眠由本程序计时，请保持程序运行）"
+            tip = self.t("sleep_tip")
         self.close_warn()
-        self.flash(f"已设定 {target_str} {word}{tip}", "ok")
+        self.flash(self.t("ok_set", t=target_str, w=word) + tip, "ok")
 
     def cancel(self):
         if not self.task:
-            return self.flash("当前没有进行中的任务", "warn")
+            return self.flash(self.t("err_no_task"), "warn")
         t = self.task
         self.task = None
         self.close_warn()
         if t["sys"]:
             ok = run_cmd(["shutdown", "/a"])
-            self.flash("已取消定时任务" if ok else "取消失败：任务可能已被取消",
+            self.flash(self.t("ok_cancel") if ok else self.t("err_cancel_fail"),
                        "ok" if ok else "warn")
         else:
-            self.flash("已取消休眠任务", "ok")
+            self.flash(self.t("ok_cancel_sleep"), "ok")
 
     def postpone(self):
         t = self.task
@@ -1004,14 +1222,14 @@ class App:
         if t["sys"]:
             run_cmd(["shutdown", "/a"])
             if not run_cmd(["shutdown", FLAG[t["type"]], "/t", "600"]):
-                return self.flash("推迟失败，请手动重新设置", "danger")
+                return self.flash(self.t("err_postpone_fail"), "danger")
         t["end"] = time.time() + 600
         t["total"] = 600
         t["warned"] = False
         t["target"] = (datetime.datetime.now() +
                        datetime.timedelta(minutes=10)).strftime("%H:%M")
         self.close_warn()
-        self.flash("任务已推迟 10 分钟", "ok")
+        self.flash(self.t("ok_postpone"), "ok")
 
     def close_warn(self):
         if self.warn_win is not None:
@@ -1056,7 +1274,7 @@ class App:
     def draw_idle(self):
         """空闲态：环完全空掉（弧 = 任务进度，不能挪作他用），中央显示当前时间作参考"""
         now = datetime.datetime.now()
-        self.draw_ring(0.0, now.strftime("%H:%M:%S"), "当前时间 · 暂无任务", big_size=26)
+        self.draw_ring(0.0, now.strftime("%H:%M:%S"), self.t("idle_sub"), big_size=26)
 
     def tick(self):
         now = datetime.datetime.now()
@@ -1065,11 +1283,12 @@ class App:
                 return
         except Exception:
             return
-        self.clock_lbl.config(text=now.strftime("%m月%d日 · ") + WEEKDAYS[now.weekday()])
+        self.clock_lbl.config(text=now.strftime(self.t("date_fmt") + " · ")
+                              + self.t("wd")[now.weekday()])
         if self.task:
             t = self.task
             remain = int(t["end"] - time.time() + 0.999)
-            word = EXEC_WORD[t["type"]]
+            word = self.t("act_" + t["type"])
             if remain > 0:
                 frac = remain / max(1, t["total"])
                 self.draw_ring(frac, fmt_sec(remain), f"{t['target']} {word}",
@@ -1080,16 +1299,16 @@ class App:
             else:
                 if t["sys"]:
                     if remain > -20:
-                        self.draw_ring(0.0, "执行中", f"{t['target']} {word}")
+                        self.draw_ring(0.0, self.t("executing"), f"{t['target']} {word}")
                     else:
                         self.task = None
                         self.draw_idle()
                 else:
                     self.task = None
                     if run_cmd(["shutdown", "/h"]):
-                        self.flash("已执行休眠", "ok")
+                        self.flash(self.t("ok_slept"), "ok")
                     else:
-                        self.flash("休眠失败：系统可能未启用休眠功能", "danger")
+                        self.flash(self.t("err_sleep_fail"), "danger")
                     self.draw_idle()
         else:
             self.draw_idle()
@@ -1113,6 +1332,7 @@ class App:
             os.makedirs(CFG_DIR, exist_ok=True)
             data = dict(self.state)
             data["theme"] = self.theme_name
+            data["lang"] = self.lang
             with open(CFG_FILE, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False)
         except Exception:
@@ -1120,10 +1340,8 @@ class App:
 
     def on_close(self):
         if self.task and not self.task["sys"]:
-            if not messagebox.askyesno(
-                    "退出确认",
-                    "有一个休眠任务正在进行中，\n退出后该任务将被取消。确定退出吗？",
-                    icon="warning"):
+            if not messagebox.askyesno(self.t("close_title"), self.t("close_body"),
+                                       icon="warning"):
                 return
         self.save_state()
         self.root.destroy()
