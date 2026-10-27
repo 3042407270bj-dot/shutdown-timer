@@ -298,7 +298,7 @@ def round_rect(cv, x1, y1, x2, y2, r, fill=None, outline=None, width=1):
     """圆角矩形：PIL 4 倍超采样抗锯齿渲染；无 PIL 时退回平滑多边形"""
     if HAS_PIL and fill is not None:
         w, h = int(round(x2 - x1)), int(round(y2 - y1))
-        ss = 6
+        ss = 3
         img = Image.new("RGBA", (max(1, w * ss), max(1, h * ss)), (0, 0, 0, 0))
         d = ImageDraw.Draw(img)
         o = width if outline else 0
@@ -323,7 +323,7 @@ def round_rect(cv, x1, y1, x2, y2, r, fill=None, outline=None, width=1):
 
 def render_ring_photo(size, thick, frac, track, accent, end_col, danger_col, danger):
     """整环一次抗锯齿渲染：轨道 + 渐变进度弧（12 点起、逆时针推进）+ 端点圆头"""
-    ss = 5
+    ss = 3
     img = Image.new("RGBA", (size * ss, size * ss), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     pad = thick // 2 + 2
@@ -427,7 +427,7 @@ class Btn(tk.Canvas):
             fill = T["accent_lo"] if self.style == "solid" else mix(T["danger"], "#000000", 0.25)
         self._tween(fill, outline, fg)
 
-    def _tween(self, fill, outline, fg, n=8):
+    def _tween(self, fill, outline, fg, n=5):
         """颜色平滑过渡，连续触发时以最新目标为准"""
         self._anim = getattr(self, "_anim", 0) + 1
         my = self._anim
