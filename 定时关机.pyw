@@ -1140,9 +1140,9 @@ class App:
         self.sw_remind.pack(side="right")
 
         # ---- 每日重复 / 系统主题 / 托盘 ----
-        self.sw_repeat = Switch(self.main, self, init=st["repeat"])
         row_rep = tk.Frame(self.main, bg=T["bg"])
         self.mk(row_rep, self.t("repeat_lbl"), 10.5).pack(side="left")
+        self.sw_repeat = Switch(row_rep, self, init=st["repeat"])
         self.sw_repeat.pack(side="right")
         row_rep.pack(fill="x", pady=(S(6), 0))
 
