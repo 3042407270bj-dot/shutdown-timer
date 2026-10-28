@@ -20,6 +20,7 @@ import math
 import os
 import subprocess
 import time
+import winreg
 import tkinter as tk
 import tkinter.messagebox as messagebox
 
@@ -28,6 +29,12 @@ try:  # PIL 用于抗锯齿渲染（缺省时自动退回 tkinter 矢量绘制�
     HAS_PIL = True
 except Exception:
     HAS_PIL = False
+
+try:  # pystray 用于系统托盘（缺省时隐藏托盘相关功能）
+    import pystray
+    HAS_TRAY = True
+except Exception:
+    HAS_TRAY = False
 
 # ---------------- 高 DPI 支持 ----------------
 try:
@@ -105,6 +112,9 @@ I18N = {
     btn_wcancel="取消任务", btn_postpone="推迟10分钟", btn_ignore="忽略",
     close_title="退出确认", close_body="有一个休眠任务正在进行中，\n退出后该任务将被取消。确定退出吗？",
     lang_set="语言已切换：{n}",
+    repeat_lbl="每天重复执行", auto_lbl="跟随系统主题",
+    tray_lbl="关闭时最小化到托盘", tray_show="显示主窗口", tray_exit="退出",
+    repeat_ok="已自动安排明天 {t} {w}", tray_tip="已最小化到托盘，双击图标恢复",
 ),
 "en": dict(
     title="Shutdown Timer", date_fmt="%b %d", wd=("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
@@ -127,6 +137,9 @@ I18N = {
     btn_wcancel="Cancel", btn_postpone="+10 min", btn_ignore="Dismiss",
     close_title="Confirm exit", close_body="A sleep task is running.\nIt will be lost if you exit. Quit anyway?",
     lang_set="Language: {n}",
+    repeat_lbl="Repeat daily", auto_lbl="Follow system theme",
+    tray_lbl="Minimize to tray on close", tray_show="Show window", tray_exit="Exit",
+    repeat_ok="Tomorrow {w} at {t} scheduled", tray_tip="Minimized to tray — double-click icon to restore",
 ),
 "fr": dict(
     title="Minuterie d'extinction", date_fmt="%d/%m", wd=("Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"),
@@ -149,6 +162,9 @@ I18N = {
     btn_wcancel="Annuler", btn_postpone="+10 min", btn_ignore="Ignorer",
     close_title="Confirmer la fermeture", close_body="Une tâche de veille est en cours.\nElle sera perdue si vous quittez. Fermer quand même ?",
     lang_set="Langue : {n}",
+    repeat_lbl="Répéter chaque jour", auto_lbl="Suivre le thème du système",
+    tray_lbl="Réduire dans la zone de notification", tray_show="Afficher la fenêtre", tray_exit="Quitter",
+    repeat_ok="Demain : {w} à {t} programmé", tray_tip="Réduit dans la zone de notification",
 ),
 "ru": dict(
     title="Таймер выключения", date_fmt="%d.%m", wd=("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"),
@@ -171,6 +187,9 @@ I18N = {
     btn_wcancel="Отменить", btn_postpone="+10 мин", btn_ignore="Скрыть",
     close_title="Подтвердите выход", close_body="Выполняется задача сна.\nОна будет отменена при выходе. Выйти?",
     lang_set="Язык: {n}",
+    repeat_lbl="Повторять ежедневно", auto_lbl="Системная тема",
+    tray_lbl="Свернуть в трей", tray_show="Показать окно", tray_exit="Выход",
+    repeat_ok="На завтра: {w} в {t}", tray_tip="Свернуто в трей — дважды щелкните значок",
 ),
 "es": dict(
     title="Apagado programado", date_fmt="%d/%m", wd=("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"),
@@ -193,6 +212,9 @@ I18N = {
     btn_wcancel="Cancelar", btn_postpone="+10 min", btn_ignore="Ignorar",
     close_title="Confirmar salida", close_body="Hay una tarea de suspensión activa.\nSe perderá al salir. ¿Salir igualmente?",
     lang_set="Idioma: {n}",
+    repeat_lbl="Repetir a diario", auto_lbl="Tema del sistema",
+    tray_lbl="Minimizar a la bandeja", tray_show="Mostrar ventana", tray_exit="Salir",
+    repeat_ok="Mañana: {w} a las {t}", tray_tip="Minimizado a la bandeja",
 ),
 "ar": dict(
     title="مؤقت إيقاف التشغيل", date_fmt="%d/%m", wd=("الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"),
@@ -215,6 +237,9 @@ I18N = {
     btn_wcancel="إلغاء", btn_postpone="+10 د", btn_ignore="تجاهل",
     close_title="تأكيد الخروج", close_body="توجد مهمة سكون جارية.\nستُفقد عند الخروج. الخروج على أي حال؟",
     lang_set="اللغة: {n}",
+    repeat_lbl="تكرار يومي", auto_lbl="مظهر النظام",
+    tray_lbl="التصغير إلى علبة النظام", tray_show="إظهار النافذة", tray_exit="خروج",
+    repeat_ok="الغد: {w} الساعة {t}", tray_tip="تم التصغير إلى العلبة",
 ),
 "zh-TW": dict(
     title="定時關機助手", date_fmt="%m月%d日", wd=("週一", "週二", "週三", "週四", "週五", "週六", "週日"),
@@ -237,6 +262,9 @@ I18N = {
     btn_wcancel="取消任務", btn_postpone="延後10分鐘", btn_ignore="忽略",
     close_title="結束確認", close_body="有睡眠任務進行中，\n結束後任務將被取消。確定離開嗎？",
     lang_set="語言已切換：{n}",
+    repeat_lbl="每天重複執行", auto_lbl="跟隨系統主題",
+    tray_lbl="關閉時最小化到通知區", tray_show="顯示主視窗", tray_exit="結束",
+    repeat_ok="已自動安排明天 {t} {w}", tray_tip="已最小化到通知區，雙擊圖示恢復",
 ),
 "la": dict(
     title="Tempus Exstinctionis", date_fmt="%d.%m", wd=("Lun", "Mar", "Mer", "Iov", "Ven", "Sab", "Sol"),
@@ -259,6 +287,9 @@ I18N = {
     btn_wcancel="Tolle", btn_postpone="+10 min", btn_ignore="Dissolve",
     close_title="Confirmare exitum", close_body="Officium somni agitur.\nPeribit si exieris. Exire tamen?",
     lang_set="Lingua: {n}",
+    repeat_lbl="Repetire cotidie", auto_lbl="Theme systematis sequi",
+    tray_lbl="Minimizare in area notific", tray_show="Monstrare fenestram", tray_exit="Exire",
+    repeat_ok="Cras: {w} hora {t}", tray_tip="In area notificationis minimizatum",
 )}
 
 CFG_DIR = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "ShutdownTimer")
@@ -378,6 +409,48 @@ def load_cfg():
         return d if isinstance(d, dict) else {}
     except Exception:
         return {}
+
+
+def system_dark():
+    """读取 Windows 深色模式设置（读不到时默认深色）"""
+    try:
+        k = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                           r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
+        v, _ = winreg.QueryValueEx(k, "AppsUseLightTheme")
+        return v == 0
+    except OSError:
+        return True
+
+
+def tray_logo_image():
+    """生成托盘用的 128px 应用图标"""
+    s = 128
+    im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    grad = Image.new("RGBA", (s, s))
+    gp = grad.load()
+    for yy in range(s):
+        for xx in range(s):
+            t = (xx + yy) / (2 * (s - 1))
+            gp[xx, yy] = tuple(int(BLUE_P[i] + (PURPLE_P[i] - BLUE_P[i]) * t) for i in range(3)) + (255,)
+    m = Image.new("L", (s, s), 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, s - 1, s - 1], radius=int(s * 0.24), fill=255)
+    im.paste(grad, (0, 0), m)
+    od = ImageDraw.Draw(im)
+    cx = cy = s / 2
+    R = s * 0.30
+    lw = int(s * 0.075)
+    od.arc([cx - R, cy - R, cx + R, cy + R], start=-68, end=248, fill=(255, 255, 255, 255), width=lw)
+    od.line([(cx, cy), (cx, cy - R + s * 0.01)], fill=(255, 255, 255, 255), width=lw)
+    L = R * 0.68; a = math.radians(46)
+    od.line([(cx, cy), (cx + L * math.cos(a), cy + L * math.sin(a))], fill=(255, 255, 255, 255), width=lw)
+    rr = lw / 2
+    od.ellipse([cx + L * math.cos(a) - rr, cy + L * math.sin(a) - rr,
+                cx + L * math.cos(a) + rr, cy + L * math.sin(a) + rr], fill=(255, 255, 255, 255))
+    od.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=(255, 255, 255, 255))
+    return im
+
+
+BLUE_P, PURPLE_P = (91, 140, 255), (139, 92, 246)
 
 
 # ---------------- 自绘组件 ----------------
@@ -840,7 +913,12 @@ class App:
     def __init__(self, root):
         self.root = root
         cfg = load_cfg()
+        self.theme_auto = bool(cfg.get("theme_auto", False))
         self.theme_name = cfg.get("theme", "dark")
+        if self.theme_auto:
+            self.theme_name = "dark" if system_dark() else "light"
+        if self.theme_name not in THEMES:
+            self.theme_name = "dark"
         self.T = THEMES[self.theme_name]
         self.lang = cfg.get("lang", "zh") if cfg.get("lang") in LANGS else "zh"
         self.HINT = self.t("hint")
@@ -849,20 +927,65 @@ class App:
             hh=str(cfg.get("hh", "23")), mm=str(cfg.get("mm", "30")),
             minutes=str(cfg.get("minutes", "30")),
             remind=bool(cfg.get("remind", True)), topmost=bool(cfg.get("topmost", False)),
+            theme_auto=self.theme_auto,
+            repeat=bool(cfg.get("repeat", False)),
+            tray_on=bool(cfg.get("tray_on", True)),
         )
+        self.repeat_conf = cfg.get("repeat_task") or None
         self.task = None
         self.warn_win = None
+        self.tray = None
         self._flash_job = None
+        self._tick_count = 0
         self.build()
         if self.state["topmost"]:
             root.attributes("-topmost", True)
         self.root.after(60, self.apply_chrome)
+        self._start_tray()
+        self._restore_repeat()
         self.tick()
 
     def t(self, key, **kw):
         """取当前语言的文案，缺漏时回退中文基准"""
         s = I18N[self.lang].get(key) or I18N["zh"][key]
         return s.format(**kw) if kw else s
+
+    # ---------- 托盘 ----------
+    def _start_tray(self):
+        if not HAS_TRAY:
+            self.tray = None
+            return
+        try:
+            menu = pystray.Menu(
+                pystray.MenuItem(self.t("tray_show"), self._tray_show, default=True),
+                pystray.MenuItem(self.t("tray_exit"), self._tray_quit),
+            )
+            self.tray = pystray.Icon("shutdown-timer", tray_logo_image(),
+                                     self.t("title"), menu)
+            self.tray.run_detached()
+        except Exception:
+            self.tray = None
+
+    def _stop_tray(self):
+        if self.tray is not None:
+            try:
+                self.tray.stop()
+            except Exception:
+                pass
+            self.tray = None
+
+    def _tray_show(self, icon=None, item=None):
+        def _show():
+            try:
+                self.root.deiconify()
+                self.root.lift()
+                self.root.focus_force()
+            except Exception:
+                pass
+        self.root.after(0, _show)
+
+    def _tray_quit(self, icon=None, item=None):
+        self.root.after(0, self._real_exit)
 
     # ---------- 界面构建 ----------
     def mk(self, parent, text, size=10, key="sub", bold=False):
@@ -1016,6 +1139,28 @@ class App:
         self.sw_remind = Switch(rrow, self, init=st["remind"])
         self.sw_remind.pack(side="right")
 
+        # ---- 每日重复 / 系统主题 / 托盘 ----
+        self.sw_repeat = Switch(self.main, self, init=st["repeat"])
+        row_rep = tk.Frame(self.main, bg=T["bg"])
+        self.mk(row_rep, self.t("repeat_lbl"), 10.5).pack(side="left")
+        self.sw_repeat.pack(side="right")
+        row_rep.pack(fill="x", pady=(S(6), 0))
+
+        row_auto = tk.Frame(self.main, bg=T["bg"])
+        self.mk(row_auto, self.t("auto_lbl"), 10.5).pack(side="left")
+        self.sw_auto = Switch(row_auto, self, init=st["theme_auto"],
+                              command=lambda v: self._auto_theme_toggled(v))
+        self.sw_auto.pack(side="right")
+        row_auto.pack(fill="x", pady=(S(6), 0))
+
+        if HAS_TRAY:
+            row_tray = tk.Frame(self.main, bg=T["bg"])
+            self.mk(row_tray, self.t("tray_lbl"), 10.5).pack(side="left")
+            self.sw_tray = Switch(row_tray, self, init=st["tray_on"],
+                                  command=lambda v: self._tray_toggled(v))
+            self.sw_tray.pack(side="right")
+            row_tray.pack(fill="x", pady=(S(6), 0))
+
         # ---- 主按钮 ----
         self.btn_start = Btn(self.main, self, self.t("btn_start"), self.start,
                              w=S(392), h=S(46), style="solid")
@@ -1125,20 +1270,84 @@ class App:
         self.root.attributes("-topmost", v)
 
     def toggle_theme(self):
+        """手动切换主题：同时关闭「跟随系统」"""
+        if self.sw_auto.winfo_exists() and self.sw_auto.value:
+            self.sw_auto.set(False)
+            self.state["theme_auto"] = False
+        target = "light" if self.theme_name == "dark" else "dark"
+        self._switch_theme(target)
+
+    def _auto_theme_toggled(self, v):
+        self.state["theme_auto"] = v
+        if v:
+            self._follow_system()
+        self.save_state()
+
+    def _follow_system(self):
+        want = "dark" if system_dark() else "light"
+        if want != self.theme_name:
+            self._switch_theme(want)
+
+    def _switch_theme(self, name):
         self.collect()
-        self.theme_name = "light" if self.theme_name == "dark" else "dark"
-        self.T = THEMES[self.theme_name]
+        self.theme_name = name
+        self.T = THEMES[name]
         px, py = self.root.winfo_x(), self.root.winfo_y()
         topmost = self.btn_top.sel
         self.main.destroy()
         self.build(recenter=False)
-        self.root.geometry(f"+{px}+{py}")   # 保持原窗口位置
+        self.root.geometry(f"+{px}+{py}")
         self.apply_chrome()
-        self.root.lift()                    # 确保窗口留在前台并获得焦点
+        self.root.lift()
         self.root.focus_force()
         if topmost:
             self.root.attributes("-topmost", True)
         self.tick()
+
+    def _tray_toggled(self, v):
+        self.state["tray_on"] = v
+        self.save_state()
+
+    # ---------- 每日重复任务 ----------
+    def _schedule_repeat(self, quiet=False):
+        """按 repeat_conf 安排下一次（今天或明天）的定时任务"""
+        rc = self.repeat_conf
+        if not rc:
+            return
+        now = datetime.datetime.now()
+        try:
+            target = now.replace(hour=int(rc["hh"]), minute=int(rc["mm"]),
+                                 second=0, microsecond=0)
+        except (ValueError, KeyError):
+            return
+        if target <= now:
+            target += datetime.timedelta(days=1)
+        sec = max(5, int((target - now).total_seconds()))
+        ttype = rc.get("type", "shutdown")
+        word = self.t("act_" + ttype)
+        if ttype in FLAG:
+            if self.task and self.task.get("sys"):
+                run_cmd(["shutdown", "/a"])
+            if not run_cmd(["shutdown", FLAG[ttype], "/t", str(sec)]):
+                return self.flash(self.t("err_admin"), "danger")
+            self.task = dict(type=ttype, end=time.time() + sec, total=sec,
+                             target=target.strftime("%H:%M"), warned=False,
+                             sys=True, repeat=True)
+        else:
+            self.task = dict(type=ttype, end=time.time() + sec, total=sec,
+                             target=target.strftime("%H:%M"), warned=False,
+                             sys=False, repeat=True)
+        if not quiet:
+            self.flash(self.t("repeat_ok", t=target.strftime("%H:%M"), w=word), "ok")
+
+    def _restore_repeat(self):
+        """启动时恢复上次的每日重复任务"""
+        if self.repeat_conf and self.state.get("repeat"):
+            self._schedule_repeat(quiet=True)
+
+    def _reschedule_after_done(self, t):
+        """重复任务执行完毕后，自动安排明天的同一任务"""
+        self._schedule_repeat()
 
     FLASH_MARK = {"ok": "✓  ", "warn": "⚠  ", "danger": "✕  "}
 
@@ -1187,6 +1396,9 @@ class App:
         word = self.t("act_" + self.ttype)
         task = dict(type=self.ttype, end=time.time() + sec, total=sec,
                     target=target_str, warned=False)
+        if self.mode == "at" and self.sw_repeat.value:
+            task["repeat"] = True
+            self.repeat_conf = {"type": self.ttype, "hh": f"{hh:02d}", "mm": f"{mm:02d}"}
         if self.ttype in FLAG:
             if self.task and self.task.get("sys"):
                 run_cmd(["shutdown", "/a"])
@@ -1207,6 +1419,7 @@ class App:
             return self.flash(self.t("err_no_task"), "warn")
         t = self.task
         self.task = None
+        self.repeat_conf = None
         self.close_warn()
         if t["sys"]:
             ok = run_cmd(["shutdown", "/a"])
@@ -1277,6 +1490,12 @@ class App:
         self.draw_ring(0.0, now.strftime("%H:%M:%S"), self.t("idle_sub"), big_size=26)
 
     def tick(self):
+        self._tick_count += 1
+        if self.state.get("theme_auto") and self._tick_count % 15 == 0:
+            want = "dark" if system_dark() else "light"
+            if want != self.theme_name:
+                self._follow_system()
+                return
         now = datetime.datetime.now()
         try:
             if not self.clock_lbl.winfo_exists():
@@ -1298,18 +1517,23 @@ class App:
                     self.show_warn(remain)
             else:
                 if t["sys"]:
-                    if remain > -20:
-                        self.draw_ring(0.0, self.t("executing"), f"{t['target']} {word}")
+                    if t.get("repeat") and remain <= -5:
+                        # 系统已执行完毕，自动安排明天的同一任务
+                        self._schedule_repeat()
+                    if self.task is t and remain > -20 and not t.get("repeat"):
+                        self.draw_ring(0.0, self.t("executing"),
+                                       f"{t['target']} {word}")
+                    elif self.task is not t:
+                        self.draw_idle()
+                else:
+                    ok = run_cmd(["shutdown", "/h"])
+                    self.flash(self.t("ok_slept") if ok else self.t("err_sleep_fail"),
+                               "ok" if ok else "danger")
+                    if t.get("repeat"):
+                        self._schedule_repeat(quiet=not ok)
                     else:
                         self.task = None
                         self.draw_idle()
-                else:
-                    self.task = None
-                    if run_cmd(["shutdown", "/h"]):
-                        self.flash(self.t("ok_slept"), "ok")
-                    else:
-                        self.flash(self.t("err_sleep_fail"), "danger")
-                    self.draw_idle()
         else:
             self.draw_idle()
         self.root.after(200, self.tick)
@@ -1322,6 +1546,7 @@ class App:
                 hh=self.e_h.get().strip() or "23", mm=self.e_m.get().strip() or "30",
                 minutes=self.e_min.get().strip() or "30",
                 remind=self.sw_remind.value, topmost=self.btn_top.sel,
+                repeat=self.sw_repeat.value,
             )
         except Exception:
             pass
@@ -1333,17 +1558,30 @@ class App:
             data = dict(self.state)
             data["theme"] = self.theme_name
             data["lang"] = self.lang
+            data["repeat_task"] = self.repeat_conf or None
             with open(CFG_FILE, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False)
         except Exception:
             pass
 
     def on_close(self):
+        """点关闭 / Alt+F4：开着托盘开关时隐藏到托盘，否则真实退出"""
+        if HAS_TRAY and self.tray is not None and self.state.get("tray_on"):
+            self.root.withdraw()
+            try:
+                self.tray.notify(self.t("tray_tip"), self.t("title"))
+            except Exception:
+                pass
+            return
+        self._real_exit()
+
+    def _real_exit(self):
         if self.task and not self.task["sys"]:
             if not messagebox.askyesno(self.t("close_title"), self.t("close_body"),
                                        icon="warning"):
                 return
         self.save_state()
+        self._stop_tray()
         self.root.destroy()
 
 
