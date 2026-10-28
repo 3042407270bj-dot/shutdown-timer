@@ -325,11 +325,11 @@ def _rgba(hx):
     return (int(hx[0:2], 16), int(hx[2:4], 16), int(hx[4:6], 16), 255)
 
 
-def round_rect(cv, x1, y1, x2, y2, r, fill=None, outline=None, width=1):
-    """圆角矩形：PIL 4 倍超采样抗锯齿渲染；无 PIL 时退回平滑多边形"""
+def round_rect(cv, x1, y1, x2, y2, r, fill=None, outline=None, width=1, ss=6):
+    """圆角矩形：PIL 超采样抗锯齿渲染；无 PIL 时退回平滑多边形
+    ss=6 为静态高清；动画中间帧传 ss=2 降低渲染成本"""
     if HAS_PIL and fill is not None:
         w, h = int(round(x2 - x1)), int(round(y2 - y1))
-        ss = 3
         img = Image.new("RGBA", (max(1, w * ss), max(1, h * ss)), (0, 0, 0, 0))
         d = ImageDraw.Draw(img)
         o = width if outline else 0
@@ -354,7 +354,7 @@ def round_rect(cv, x1, y1, x2, y2, r, fill=None, outline=None, width=1):
 
 def render_ring_photo(size, thick, frac, track, accent, end_col, danger_col, danger):
     """整环一次抗锯齿渲染：轨道 + 渐变进度弧（12 点起、逆时针推进）+ 端点圆头"""
-    ss = 3
+    ss = 4
     img = Image.new("RGBA", (size * ss, size * ss), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     pad = thick // 2 + 2
@@ -500,11 +500,14 @@ class Btn(tk.Canvas):
             fill = T["accent_lo"] if self.style == "solid" else mix(T["danger"], "#000000", 0.25)
         self._tween(fill, outline, fg)
 
-    def _tween(self, fill, outline, fg, n=5):
-        """颜色平滑过渡，连续触发时以最新目标为准"""
+    def _tween(self, fill, outline, fg, n=4):
+        """颜色平滑过渡：中间帧低倍率渲染，最终帧 6x 高清（连续触发以最新目标为准）"""
+        target = (fill, outline, fg)
+        if getattr(self, "_cur", None) == target:
+            return
         self._anim = getattr(self, "_anim", 0) + 1
         my = self._anim
-        start = getattr(self, "_cur", None) or (fill, outline, fg)
+        start = getattr(self, "_cur", None) or target
 
         def step(i):
             if my != self._anim:
@@ -512,16 +515,16 @@ class Btn(tk.Canvas):
             f = mix(start[0], fill, i / n)
             o = mix(start[1], outline, i / n) if (outline and start[1]) else outline
             self._cur = (f, o, fg)
-            self._redraw(f, o, fg)
+            self._redraw(f, o, fg, ss=(6 if i == n else 2))
             if i < n:
                 self.after(16, step, i + 1)
 
         step(0)
 
-    def _redraw(self, fill, outline, fg):
+    def _redraw(self, fill, outline, fg, ss=6):
         self.delete("all")
         round_rect(self, S(1), S(1), self.W - S(1), self.H - S(1), S(12),
-                   fill=fill, outline=outline, width=S(1))
+                   fill=fill, outline=outline, width=S(1), ss=ss)
         self.create_text(self.W / 2, self.H / 2, text=self.text, fill=fg,
                          font=(FONT, FS(self.fs), "bold"))
 
@@ -566,6 +569,8 @@ class Chip(tk.Canvas):
 
     def _render(self):
         bg, fg, outline = self._target()
+        if self._cur == (bg, fg, outline):
+            return
         self._anim += 1
         my = self._anim
         start = self._cur or (bg, fg, outline)
@@ -580,7 +585,7 @@ class Chip(tk.Canvas):
             self._cur = (cb, cf, co)
             self.delete("all")
             round_rect(self, S(1), S(1), self.W - S(1), self.H - S(1), S(12),
-                       fill=cb, outline=co, width=S(1))
+                       fill=cb, outline=co, width=S(1), ss=(6 if i == n else 2))
             self.create_text(self.W / 2, self.H / 2, text=self.text, fill=cf,
                              font=(FONT, FS(11), "bold"))
             if i < n:
@@ -663,6 +668,8 @@ class IconBtn(tk.Canvas):
 
     def _render(self):
         bg, fg = self._target()
+        if self._cur == (bg, fg):
+            return
         self._anim += 1
         my = self._anim
         start = self._cur or (bg, fg)
@@ -676,7 +683,8 @@ class IconBtn(tk.Canvas):
             self._cur = (cb, cf)
             self.delete("all")
             round_rect(self, S(1), S(1), self.W - S(1), self.H - S(1), S(10),
-                       fill=cb, outline=self.app.T["stroke"], width=S(1))
+                       fill=cb, outline=self.app.T["stroke"], width=S(1),
+                       ss=(6 if i == n else 2))
             self.draw_fn(self, cf, cb)
             if i < n:
                 self.after(16, step, i + 1)
@@ -730,7 +738,8 @@ class Segmented(tk.Canvas):
             if self.knob is not None:
                 self.delete(self.knob)
             self.knob = round_rect(self, xx, self.pad + S(2), xx + self.seg_w,
-                                   self.H - self.pad - S(2), S(11), fill=T["accent"])
+                                   self.H - self.pad - S(2), S(10), fill=T["accent"],
+                                   ss=(6 if i == n else 2))
             self.tag_raise(self.knob)
             for item in self.txt.values():
                 self.tag_raise(item)
@@ -783,18 +792,18 @@ class Switch(tk.Canvas):
                 kx = start + (target - start) * (i / n)
             else:
                 kx = target
-            self._draw(v, kx)
+            self._draw(v, kx, ss=(6 if i == n else 2))
             if i < n:
                 self.after(16, step, i + 1)
 
         step(0)
 
-    def _draw(self, v, kx):
+    def _draw(self, v, kx, ss=6):
         T = self.app.T
         self.delete("all")
         round_rect(self, S(1), S(1), self.W - S(1), self.H - S(1), (self.H - S(2)) / 2,
                    fill=T["accent"] if v else T["card2"],
-                   outline=T["accent"] if v else T["stroke"], width=S(1))
+                   outline=T["accent"] if v else T["stroke"], width=S(1), ss=ss)
         kx = self._knx(v) if kx is None else kx
         r = self.H / 2 - S(4)
         self.create_oval(kx - r, self.H / 2 - r, kx + r, self.H / 2 + r,
